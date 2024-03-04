@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FFmpeg.wasm Example</title>
+<title>FFmpeg.js Example</title>
 </head>
 <body>
   <input type="file" id="inputFile" accept="video/*">
@@ -11,29 +11,43 @@
   <progress id="progressBar" value="0" max="100"></progress>
   <p id="status"></p>
 
-  <script type="module">
-    import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+  <script src="https://cdn.jsdelivr.net/npm/ffmpeg.js"></script>
 
-    const ffmpeg = createFFmpeg({ log: true });
-
+  <script>
     const inputFile = document.getElementById('inputFile');
     const progressBar = document.getElementById('progressBar');
     const status = document.getElementById('status');
+    let ffmpeg = null;
 
-    inputFile.addEventListener('change', async (event) => {
+    inputFile.addEventListener('change', (event) => {
       const file = event.target.files[0];
-      await ffmpeg.load();
+      ffmpeg = createFFmpeg({
+        log: true,
+        corePath: 'https://cdn.jsdelivr.net/npm/ffmpeg.js/ffmpeg-core.js'
+      });
+      ffmpeg.setProgress(({ ratio }) => {
+        progressBar.value = ratio * 100;
+      });
+      ffmpeg.setLogger(({ message }) => {
+        status.textContent = message;
+      });
+
+      const loadFFmpeg = async () => {
+        await ffmpeg.load();
+        status.textContent = 'File loaded. Ready to convert.';
+      };
+
+      loadFFmpeg();
       ffmpeg.FS('writeFile', file.name, await fetchFile(file));
-      status.textContent = 'File loaded. Ready to convert.';
     });
 
     async function convertVideo() {
-      const file = inputFile.files[0];
-      if (!file) {
+      if (!ffmpeg) {
         status.textContent = 'Please select a file first.';
         return;
       }
 
+      const file = inputFile.files[0];
       const outputFileName = 'output.mp4';
       status.textContent = 'Converting...';
       await ffmpeg.run('-i', file.name, outputFileName);
