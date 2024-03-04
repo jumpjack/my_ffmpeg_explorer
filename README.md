@@ -1,3 +1,9 @@
+Forked to try implementing some enhancements:
+- images support
+- realtime support
+- ...
+
+- 
 # Interactive FFMPEG Command Generator
 
 **~~~~> [ffmpeg.lav.io](https://ffmpeg.lav.io) <~~~~**
