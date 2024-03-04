@@ -26,10 +26,12 @@
             // Load ffmpeg.js
             const ffmpeg = createFFmpeg({ log: true });
             await ffmpeg.load();
+console.log("FFMPEG=",ffmpeg);            
+console.log("run=",ffmpeg.run());            
 
             // Convert video
-            ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(file));
-            await ffmpeg.run('-i', 'input.mp4', 'output.gif');
+            ffmpeg.FS('writeFile', 'input.jpg', await fetchFile(file));
+            await ffmpeg.run('-i', 'input.jpg', '-vf v360=fisheye:e:ih_fov=200:iv_fov=200', 'output.jpg');
 
             // Fetch the result
             const data = ffmpeg.FS('readFile', 'output.gif');
