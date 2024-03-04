@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FFmpeg.wasm Example</title>
+</head>
+<body>
+  <input type="file" id="inputFile" accept="video/*">
+  <button onclick="convertVideo()">Convert Video</button>
+  <progress id="progressBar" value="0" max="100"></progress>
+  <p id="status"></p>
+
+  <script type="module">
+    import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+
+    const ffmpeg = createFFmpeg({ log: true });
+
+    const inputFile = document.getElementById('inputFile');
+    const progressBar = document.getElementById('progressBar');
+    const status = document.getElementById('status');
+
+    inputFile.addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      await ffmpeg.load();
+      ffmpeg.FS('writeFile', file.name, await fetchFile(file));
+      status.textContent = 'File loaded. Ready to convert.';
+    });
+
+    async function convertVideo() {
+      const file = inputFile.files[0];
+      if (!file) {
+        status.textContent = 'Please select a file first.';
+        return;
+      }
+
+      const outputFileName = 'output.mp4';
+      status.textContent = 'Converting...';
+      await ffmpeg.run('-i', file.name, outputFileName);
+      const data = ffmpeg.FS('readFile', outputFileName);
+      const blob = new Blob([data.buffer], { type: 'video/mp4' });
+
+      // Download the converted video
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = outputFileName;
+      downloadLink.click();
+
+      status.textContent = 'Conversion completed.';
+    }
+  </script>
+</body>
+</html>
