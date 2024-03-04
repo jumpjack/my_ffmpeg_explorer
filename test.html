@@ -31,7 +31,7 @@ console.log("FFMPEG=",ffmpeg);
 
             // Convert video
             ffmpeg.FS('writeFile', 'input.jpg', await fetchFile(file));
-            await ffmpeg.run('-i', 'input.jpg', '-vf v360=fisheye:e:ih_fov=200:iv_fov=200', 'output.jpg');
+            await ffmpeg.run('-i', 'input.jpg', '-vf v360=fisheye:e:ih_fov=200:iv_fov=200', 'output.gif');
 
             // Fetch the result
             const data = ffmpeg.FS('readFile', 'output.gif');
