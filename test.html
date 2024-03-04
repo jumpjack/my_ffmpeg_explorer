@@ -27,7 +27,7 @@
             const ffmpeg = createFFmpeg({ log: true });
             await ffmpeg.load();
 console.log("FFMPEG=",ffmpeg);            
-console.log("run=",ffmpeg.run());            
+   
 
             // Convert video
             ffmpeg.FS('writeFile', 'input.jpg', await fetchFile(file));
